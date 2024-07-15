@@ -9,11 +9,13 @@
 
 
 
-int main(int argc, char** argv) {
+int main(void) {
     char* string = NULL;
-    double size = 0;
-    char* line;
-    line = getline(&string, &size, stdin);
-    printf("getline returned %ld\n", line);
+    size_t size = 0;
+    ssize_t line; 
+    if(line = getline(&string, &size, stdin) == -1){
+        exit(1);
+    }
+    printf("getline returned %s\n", line);
     return 0;
     }
