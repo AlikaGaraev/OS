@@ -16,6 +16,7 @@ int main(void) {
     double line; 
     if((line = (double)getline(&string, &size, stdin)) != -1){
         printf("getline returned %f:\n", (double) line);
+        printf("line is %s\n", string);
         return 0;
     }
     
