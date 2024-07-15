@@ -1,7 +1,8 @@
+#define  _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define  _GNU_SOURCE
+
 
 
 #define MAX_ITER 200
@@ -10,12 +11,13 @@
 
 
 int main(void) {
-    char* string = NULL;
+    char *string = NULL;
     size_t size = 0;
-    ssize_t line; 
-    if(line = getline(&string, &size, stdin) == -1){
-        exit(1);
+    double line; 
+    if((line = (double)getline(&string, &size, stdin)) != -1){
+        printf("getline returned %f:\n", (double) line);
+        return 0;
     }
-    printf("getline returned %s\n", line);
+    
     return 0;
-    }
+}
