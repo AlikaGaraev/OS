@@ -283,27 +283,34 @@ void free_memory(datapoint* head, int centroids_size, int new_centroids_size) {
     free(new_centroids);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     int num_iteration = 0;
     datapoint* head;
     datapoint* curr_point;
+    printf("1");
     if (argc < 2 || argc > 3) {
         general_error();
     }
+    printf("2");
     k = atoi(argv[1]);     /*האם צריך לבדוק שקיי הוא אכן אינט או ושונה מאפס*/
     /*if there is no argument passed for max number of iterations*/
     if (argc == 2) {     
         max_iter = 200;
+        printf("3");
     }
     if (argc == 3) {
         max_iter = atoi(argv[1]);
+        printf("4");
     }
     head = readText();
+    printf("5");
     curr_point = head;
     initilize_original_centroids(head);
+    printf("6");
     while (num_iteration < max_iter) {
         while (curr_point->next != NULL) {
             closest_cluster(curr_point);
+            printf("7");
             curr_point = curr_point->next;
         }
         update_centroid(head);
