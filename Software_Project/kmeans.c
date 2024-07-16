@@ -91,7 +91,8 @@ datapoint* readText() {
         curr_cord->next = NULL;
         dimention++;
     }
-     if (k <= 1 || k >= num_of_points)
+    prev_point->next = NULL;
+    if (k <= 1 || k >= num_of_points)
         {
             printf("Invalid number of clusters!\n");
             exit(1);
@@ -243,7 +244,6 @@ int main(int argc, char *argv[]) {
     int num_iteration = 0;
     datapoint* head;
     datapoint* curr_point;
-    int i;
     if (argc < 2 || argc > 3) {
         general_error();
     }
@@ -270,4 +270,5 @@ int main(int argc, char *argv[]) {
         centroids = new_centroids;
     }
     print_result();
+    return 0;
 }
