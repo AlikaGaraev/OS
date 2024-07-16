@@ -27,6 +27,17 @@ double **centroids;
 double **new_centroids;
 const double EPSILON = 0.001;
 
+void general_error();
+datapoint* readText();
+void initilize_original_centroids (datapoint*);
+double distance(datapoint*, double*);
+double distance_doubles(double*, double*);
+void closest_cluster(datapoint*);
+void update_centroid(datapoint*);
+int delta_centroid();
+void print_result();
+void free_memory(datapoint*, int, int);
+
 /*general error message*/
 void general_error() {
     printf("An Error Has Occured\n");
@@ -67,6 +78,7 @@ datapoint* readText() {
             curr_point->pointer = head_cord;
             head_cord = malloc(sizeof(coordinate));
             if (head_cord == NULL) {
+                free_memory(head_point, 0, 0);
                 general_error();
             }
             prev_point = curr_point;
@@ -74,7 +86,7 @@ datapoint* readText() {
             curr_point->next = NULL;
             head_point = malloc(sizeof(datapoint));
             if (head_point == NULL) {
-                free(head_cord); /*TODO memory free*/
+                free_memory(head_point, 0, 0);
                 general_error();
             }
             curr_point = head_point;
@@ -85,13 +97,16 @@ datapoint* readText() {
         curr_cord->value = curr_value;
         curr_cord->next = malloc(sizeof(coordinate));
         if (head_cord == NULL) {
-            general_error();   /*TODO memory free*/
+            free_memory(head_point, 0, 0);
+            general_error();
         }
         curr_cord = curr_cord->next;
         curr_cord->next = NULL;
         dimention++;
     }
     prev_point->next = NULL;
+    free(curr_cord);
+    free(curr_point);
     if (k <= 1 || k >= num_of_points)
         {
             printf("Invalid number of clusters!\n");
@@ -107,26 +122,26 @@ void initilize_original_centroids (datapoint* point_head) {
     int j;
     coordinate* curr_coordinate = point_head->pointer;
     /*allocate memory for the centriods matrix*/
-    centroids = (double**)malloc(num_of_points * sizeof(double*));
+    centroids = (double**)malloc(k * sizeof(double*));
     if (centroids == NULL) {
-        /*TODO memrory free*/
+        free_memory(point_head,0 ,0);
         general_error();
     }
     new_centroids = (double**)malloc(num_of_points * sizeof(double*));
     if (new_centroids == NULL) {
-        /*TODO memrory free*/
+        free_memory(point_head,0 ,0);
         general_error();
     }
     /*allocate memory for each row in the centroids matrix (each datapoint)*/
     for (i = 0; i < k; i++) {
         centroids[i] = (double*)malloc(dimention * sizeof(double));
         if (centroids[i] == NULL) {
-            /*TODO memrory free*/
+            free_memory(point_head, i - 1, i - 1);
             general_error();
         }
         new_centroids[i] = (double*)malloc(dimention * sizeof(double));
         if (new_centroids[i] == NULL) {
-            /*TODO memrory free*/
+            free_memory(point_head, i, i - 1);
             general_error();
         }
     }
@@ -136,7 +151,8 @@ void initilize_original_centroids (datapoint* point_head) {
         }
         point_head = point_head->next;
         curr_coordinate = point_head->pointer;
-    }
+        }  
+    
 }
 
 /*calculating eclidean distance between datapoint p1 and array of doubles p2*/
@@ -165,10 +181,11 @@ double distance_doubles(double* p1, double* p2) {
 /*find the closest centroid for datapoint and assiging the cluster*/
 void closest_cluster(datapoint* point_head) {
     double min_distance = distance(point_head, centroids[0]);
+    double curr_distance;
     int min_index = 0;
     int i;
     for (i = 1; i < k; i++){
-        double curr_distance = distance(point_head, centroids[i]);
+        curr_distance = distance(point_head, centroids[i]);
         if (curr_distance < min_distance) {
             min_distance = curr_distance;
             min_index = i;
@@ -187,7 +204,7 @@ void update_centroid(datapoint* point_head) {
     double* sums;
     sums = (double*)malloc(dimention * sizeof(double*));
     if (sums == NULL) {
-        /*TODO memrory free*/
+        free_memory(point_head, k, k);
         general_error();
     }
     for (i = 0; i < k; i++) {
@@ -240,6 +257,32 @@ void print_result()
     }
 }
 
+void free_memory(datapoint* head, int centroids_size, int new_centroids_size) {
+    int i;
+    datapoint* tmp_datapoint;
+    coordinate* tmp_cord;
+    while (head != NULL) {
+        while (head->pointer != NULL) {
+            tmp_cord = head->pointer;
+            head->pointer = head->pointer->next;
+            free(tmp_cord);
+        }
+        tmp_datapoint = head;
+        head = head->next;
+        free(tmp_datapoint);
+    }
+    /*free centroids*/
+    for (i = 0; i < centroids_size; i++) {
+        free(centroids[i]);
+    }
+    free(centroids);
+    /*free new_centroids*/
+    for (i = 0; i < new_centroids_size; i++) {
+        free(new_centroids[i]);
+    }
+    free(new_centroids);
+}
+
 int main(int argc, char *argv[]) {
     int num_iteration = 0;
     datapoint* head;
@@ -268,7 +311,9 @@ int main(int argc, char *argv[]) {
             break;
         }
         centroids = new_centroids;
+        num_iteration++;
     }
     print_result();
+    free_memory(head, k, k);
     return 0;
 }
